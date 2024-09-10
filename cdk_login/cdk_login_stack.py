@@ -37,11 +37,12 @@ class CdkLoginStack(Stack):
         #Granting addUsers lambda funtion write permision to dynamo db
         users_table.grant_read_write_data(addUsers_lambda)
         
-        create_api = apigateway.LambdaRestApi(
-            self, "createUsersApi",
-            handler=addUsers_lambda,
+        api = apigateway.RestApi(
+            self, "usersApi",
         )
-        create_api.root.add_method("POST")
+        users_resourse = api.root.add_resource('users')
+        
+        users_resourse.add_method("POST", apigateway.LambdaIntegration(addUsers_lambda))
         
         # 2. deleating users
         #Lambda function to delete user
@@ -57,11 +58,7 @@ class CdkLoginStack(Stack):
         
         users_table.grant_read_write_data(deleteUsers_lambda)
         
-        delete_api = apigateway.LambdaRestApi(
-            self, "deleteUsersApi",
-            handler=deleteUsers_lambda,
-        )
-        delete_api.root.add_method("DELETE")
+        users_resourse.add_method("DELETE", apigateway.LambdaIntegration(deleteUsers_lambda))
         
         # 3. update password
         #Lambda function to update password 
@@ -75,9 +72,20 @@ class CdkLoginStack(Stack):
             }
         )
         users_table.grant_read_write_data(updateUsers_lambda)
-        update_api = apigateway.LambdaRestApi(
-            self, "updateUsersApi",
-            handler=updateUsers_lambda,
-        )
-        update_api.root.add_method("PUT")
         
+        users_resourse.add_method("PUT", apigateway.LambdaIntegration(updateUsers_lambda))
+        
+        # 4. Display DynamoDB items
+        #Lambda function to get all table items
+        displayUsers_lambda = _lambda.Function(
+            self, 'displayUsersLambdaFunction',
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler='displayUsers.handler',
+            code=_lambda.Code.from_asset('lambda'),
+            environment={
+                'TABLE_NAME': users_table.table_name
+            }
+        )
+        users_table.grant_read_write_data(displayUsers_lambda)
+        
+        users_resourse.add_method("GET", apigateway.LambdaIntegration(displayUsers_lambda))
