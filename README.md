@@ -1,26 +1,24 @@
-This project is serveless login system which uses Lambda, DynamoDB and API gateway.The stack provides functionalities to create, delete, and update user credentials through RESTful APIs.
+This project is serveless login system which uses Lambda, DynamoDB, API gateway and s3.The stack provides functionalities to create, delete, and update user credentials through RESTful APIs and to upload files to s3.
 
 Features
 
-    Create Users: Add new users with their usernames and passwords.
-    Delete Users: Remove existing users from the database.
-    Update Passwords: Update the passwords for existing users.
+    UserOperations: create, update, delete, display users
+    filesOperations: upload files to s3
 
 Components
 
     DynamoDB Table: Stores user details with username as the partition key.
     AWS Lambda Functions:
-        createUsersLambdaFunction: Handles the creation of new users.
-        deleteUsersLambdaFunction: Manages the deletion of users.
-        updateUsersLambdaFunction: Updates user passwords.
-    API Gateway: Diiferent RESTful APIs for interacting with the Lambda functions:
-        POST / for creating users
-        DELETE / for deleting users
-        PUT / for updating passwords
+        userOperations: user operations
+        fileOperations: top upload files and update s3 key in dynamodb
+    API Gateway: APIs for interacting with the Lambda functions:
+        /users
+        POST, PUT, GET, DELETE
+        /users/{username}/files
+        POST
 
 Directory Structure
 
     lambda/: Contains Lambda function code.
-        addUsers.py: Handler for creating users.
-        deleteUsers.py: Handler for deleting users.
-        updateUsers.py: Handler for updating passwords.
+        userOperations.py: Handler for user operation.
+        fileOperations.py: Handler for uploding files.
