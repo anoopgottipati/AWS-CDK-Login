@@ -25,13 +25,31 @@ def handler(event, context):
         Key=s3_key,
     )
     
+    response = table.get_item(
+        Key={
+        'username': username
+        }
+    )
+    
+    user = response['Item']
+    
+    s3_key_list = user.get('s3_bucket_key_list', [])
+    
+    if s3_key not in s3_key_list:
+        s3_key_list.append(s3_key)
+    else:
+        return {
+            'statusCode': 200,
+            'body': json.dumps(f"file with name {filename} is already present")
+        }
+    
     table.update_item(
             Key={
                 'username': username
             },
-            UpdateExpression='SET s3_bucket_key = :s3_key',
+            UpdateExpression='SET s3_bucket_key_list = :s3_key_list',
             ExpressionAttributeValues={
-                ':s3_key': s3_key
+                ':s3_key_list': s3_key_list
             }
         )
     

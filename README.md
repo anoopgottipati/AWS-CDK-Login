@@ -10,7 +10,7 @@ Components
     DynamoDB Table: Stores user details with username as the partition key.
     AWS Lambda Functions:
         userOperations: user operations
-        fileOperations: top upload files and update s3 key in dynamodb
+        fileOperations: to upload files and update s3 key in dynamodb
     API Gateway: APIs for interacting with the Lambda functions:
         /users
         POST, PUT, GET, DELETE
